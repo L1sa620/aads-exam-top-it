@@ -7,42 +7,48 @@
 
 namespace matveev
 {
-  bool parseArguments(int argc, char **argv, bool &inSet, std::string &inName, bool &outSet, std::string &outName)
+
+ bool parseArguments(int argc, char **argv, bool &inSet, std::string &inName, bool &outSet, std::string &outName)
+ {
+  inSet = false;
+  outSet = false;
+  inName.clear();
+  outName.clear();
+
+  if (argc > 3)
   {
-    inSet = false;
-    outSet = false;
-    if (argc > 3)
+    return false;
+  }
+
+  for (int i = 1; i < argc; ++i)
+  {
+    std::string arg(argv[i]);
+
+    if (arg.compare(0, 3, "in:") == 0)
     {
-      return false;
-    }
-    for (int i = 1; i < argc; ++i)
-    {
-      std::string arg(argv[i]);
-      if (arg.compare(0, 3, "in:") == 0)
-      {
-        if (inSet)
-        {
-          return false;
-        }
-        inSet = true;
-        inName = arg.substr(3);
-      }
-      else if (arg.compare(0, 4, "out:") == 0)
-      {
-        if (outSet)
-        {
-          return false;
-        }
-        outSet = true;
-        outName = arg.substr(4);
-      }
-      else
+      if (inSet || arg.size() == 3)
       {
         return false;
       }
+      inSet = true;
+      inName = arg.substr(3);
     }
-    return true;
+    else if (arg.compare(0, 4, "out:") == 0)
+    {
+      if (outSet || arg.size() == 4)
+      {
+        return false;
+      }
+      outSet = true;
+      outName = arg.substr(4);
+    }
+    else
+    {
+      return false;
+    }
   }
+
+  return true;
 }
 
 int main(int argc, char **argv)
@@ -123,10 +129,6 @@ int main(int argc, char **argv)
     matveev::writePerson(*output, people.data[i]);
     *output << '\n';
   }
-  if (validCount != 0 || ignoredCount != 0)
-  {
-    std::cerr << validCount << ' ' << ignoredCount << '\n';
-  }
-
+  std::cerr << validCount << ' ' << ignoredCount << '\n';
   return 0;
 }
