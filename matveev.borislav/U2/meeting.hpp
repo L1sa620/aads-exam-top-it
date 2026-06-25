@@ -5,6 +5,7 @@
 #include <iosfwd>
 
 #include "../common/array.hpp"
+#include "../common/person.hpp"
 
 namespace matveev
 {
@@ -16,6 +17,9 @@ namespace matveev
   };
 
   bool readMeetings(std::istream &input, Array< Meeting > &meetings);
+  bool readPersons(std::istream &input, Array< Person > &persons);
+  size_t findPersonIndex(const Array< Person > &persons, size_t id);
+  void addMeetingPersons(const Array< Meeting > &meetings, Array< Person > &persons);
 }
 
 #endif

@@ -94,6 +94,19 @@ int main(int argc, char **argv)
     return 3;
   }
 
+  matveev::Array< matveev::Person > persons;
+
+  if (inSet)
+  {
+    if (!matveev::readPersons(inputFile, persons))
+    {
+      std::cerr << "Invalid persons\n";
+      return 3;
+    }
+  }
+
+  matveev::addMeetingPersons(meetings, persons);
+
   std::string command;
 
   while (std::getline(std::cin, command))

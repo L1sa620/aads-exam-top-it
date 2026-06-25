@@ -123,3 +123,59 @@ bool matveev::readMeetings(std::istream &input, Array< Meeting > &meetings)
 
   return true;
 }
+
+bool matveev::readPersons(std::istream &input, Array< Person > &persons)
+{
+  while (input)
+  {
+    Person person;
+    bool valid = false;
+
+    if (!readPerson(input, person, valid))
+    {
+      return !input.bad();
+    }
+
+    if (valid && findPersonIndex(persons, person.id) == persons.size)
+    {
+      pushBack(persons, person);
+    }
+  }
+
+  return !input.bad();
+}
+
+size_t matveev::findPersonIndex(const Array< Person > &persons, size_t id)
+{
+  for (size_t i = 0; i < persons.size; ++i)
+  {
+    if (persons.data[i].id == id)
+    {
+      return i;
+    }
+  }
+
+  return persons.size;
+}
+
+void matveev::addMeetingPersons(const Array< Meeting > &meetings, Array< Person > &persons)
+{
+  for (size_t i = 0; i < meetings.size; ++i)
+  {
+    if (findPersonIndex(persons, meetings.data[i].first) == persons.size)
+    {
+      Person person;
+      person.id = meetings.data[i].first;
+      person.info.clear();
+      pushBack(persons, person);
+    }
+
+    if (findPersonIndex(persons, meetings.data[i].second) == persons.size)
+    {
+      Person person;
+      person.id = meetings.data[i].second;
+      person.info.clear();
+      pushBack(persons, person);
+    }
+  }
+}
