@@ -24,6 +24,7 @@ namespace matveev
         {
           return false;
         }
+
         inSet = true;
         inName = arg.substr(3);
       }
@@ -33,6 +34,7 @@ namespace matveev
         {
           return false;
         }
+
         outSet = true;
         outName = arg.substr(4);
       }
@@ -43,6 +45,21 @@ namespace matveev
     }
 
     return true;
+  }
+
+  void writePeople(std::ostream &out, const Array< Person > &people)
+  {
+    if (people.size == 0)
+    {
+      out << '\n';
+      return;
+    }
+
+    for (size_t i = 0; i < people.size; ++i)
+    {
+      writePerson(out, people.data[i]);
+      out << '\n';
+    }
   }
 }
 
@@ -76,6 +93,7 @@ int main(int argc, char **argv)
       std::cerr << "Cannot open file\n";
       return 2;
     }
+
     input = &inputFile;
   }
 
@@ -123,37 +141,24 @@ int main(int argc, char **argv)
 
   std::cerr << validCount << ' ' << ignoredCount << '\n';
 
-  std::ofstream outputFile;
-  std::ostream *output = &std::cout;
-
   if (outSet)
   {
-    outputFile.open(outName);
+    std::ofstream outputFile(outName);
     if (!outputFile)
     {
       std::cerr << "Cannot open file\n";
       return 2;
     }
-    output = &outputFile;
-  }
 
-  for (size_t i = 0; i < people.size; ++i)
-  {
-    matveev::writePerson(*output, people.data[i]);
-    *output << '\n';
-  }
+    matveev::writePeople(outputFile, people);
 
-  if (people.size == 0)
-  {
-    *output << '\n';
+    std::cout << "in file " << outName << '\n';
+    matveev::writePeople(std::cout, people);
   }
   else
   {
-    for (size_t i = 0; i < people.size; ++i)
-    {
-      matveev::writePerson(*output, people.data[i]);
-      *output << '\n';
-    }
+    matveev::writePeople(std::cout, people);
   }
+
   return 0;
 }
