@@ -14,30 +14,27 @@ namespace matveev
     inName.clear();
     outName.clear();
 
-    if (argc > 3)
-    {
-      return false;
-    }
-
     for (int i = 1; i < argc; ++i)
     {
       std::string arg(argv[i]);
 
       if (arg.compare(0, 3, "in:") == 0)
       {
-        if (inSet || arg.size() == 3)
+        if (inSet)
         {
           return false;
         }
+
         inSet = true;
         inName = arg.substr(3);
       }
       else if (arg.compare(0, 4, "out:") == 0)
       {
-        if (outSet || arg.size() == 4)
+        if (outSet)
         {
           return false;
         }
+
         outSet = true;
         outName = arg.substr(4);
       }
@@ -49,10 +46,31 @@ namespace matveev
 
     return true;
   }
+
+  void writePeople(std::ostream &out, const Array< Person > &people)
+  {
+    if (people.size == 0)
+    {
+      out << '\n';
+      return;
+    }
+
+    for (size_t i = 0; i < people.size; ++i)
+    {
+      writePerson(out, people.data[i]);
+      out << '\n';
+    }
+  }
 }
 
 int main(int argc, char **argv)
 {
+  if (argc > 3)
+  {
+    std::cerr << "Invalid arguments\n";
+    return 0;
+  }
+
   bool inSet = false;
   bool outSet = false;
   std::string inName;
@@ -75,6 +93,7 @@ int main(int argc, char **argv)
       std::cerr << "Cannot open file\n";
       return 2;
     }
+
     input = &inputFile;
   }
 
@@ -122,31 +141,24 @@ int main(int argc, char **argv)
 
   std::cerr << validCount << ' ' << ignoredCount << '\n';
 
-  std::ofstream outputFile;
-  std::ostream *output = &std::cout;
-
   if (outSet)
   {
-    outputFile.open(outName);
+    std::ofstream outputFile(outName);
     if (!outputFile)
     {
       std::cerr << "Cannot open file\n";
       return 2;
     }
-    output = &outputFile;
-  }
 
-  if (people.size == 0)
-  {
-    *output << '\n';
+    matveev::writePeople(outputFile, people);
+
+    std::cout << "in file " << outName << '\n';
+    matveev::writePeople(std::cout, people);
   }
   else
   {
-    for (size_t i = 0; i < people.size; ++i)
-    {
-      matveev::writePerson(*output, people.data[i]);
-      *output << '\n';
-    }
+    matveev::writePeople(std::cout, people);
   }
+
   return 0;
 }
