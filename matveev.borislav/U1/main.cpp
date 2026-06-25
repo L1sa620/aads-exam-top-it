@@ -1,17 +1,79 @@
+#include <fstream>
 #include <iostream>
+#include <string>
 
 #include "array.hpp"
 #include "person.hpp"
 
-int main()
+namespace matveev
 {
+  bool parseArguments(int argc, char **argv, bool &inSet, std::string &inName, bool &outSet, std::string &outName)
+  {
+    inSet = false;
+    outSet = false;
+    if (argc > 3)
+    {
+      return false;
+    }
+    for (int i = 1; i < argc; ++i)
+    {
+      std::string arg(argv[i]);
+      if (arg.compare(0, 3, "in:") == 0)
+      {
+        if (inSet)
+        {
+          return false;
+        }
+        inSet = true;
+        inName = arg.substr(3);
+      }
+      else if (arg.compare(0, 4, "out:") == 0)
+      {
+        if (outSet)
+        {
+          return false;
+        }
+        outSet = true;
+        outName = arg.substr(4);
+      }
+      else
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+
+int main(int argc, char **argv)
+{
+  bool inSet = false;
+  bool outSet = false;
+  std::string inName;
+  std::string outName;
+  if (!matveev::parseArguments(argc, argv, inSet, inName, outSet, outName))
+  {
+    return 1;
+  }
+
+  std::ifstream inputFile;
+  std::istream *input = &std::cin;
+  if (inSet)
+  {
+    inputFile.open(inName);
+    if (!inputFile)
+    {
+      return 2;
+    }
+    input = &inputFile;
+  }
+
   matveev::Array< matveev::Person > people;
   size_t validCount = 0;
   size_t ignoredCount = 0;
-
   matveev::Person person;
   bool valid = false;
-  while (matveev::readPerson(std::cin, person, valid))
+  while (matveev::readPerson(*input, person, valid))
   {
     if (valid)
     {
@@ -39,11 +101,27 @@ int main()
       ++ignoredCount;
     }
   }
+  if (inSet)
+  {
+    inputFile.close();
+  }
+
+  std::ofstream outputFile;
+  std::ostream *output = &std::cout;
+  if (outSet)
+  {
+    outputFile.open(outName);
+    if (!outputFile)
+    {
+      return 2;
+    }
+    output = &outputFile;
+  }
 
   for (size_t i = 0; i < people.size; ++i)
   {
-    matveev::writePerson(std::cout, people.data[i]);
-    std::cout << '\n';
+    matveev::writePerson(*output, people.data[i]);
+    *output << '\n';
   }
   std::cerr << validCount << ' ' << ignoredCount << '\n';
 
