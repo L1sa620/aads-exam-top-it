@@ -2,8 +2,8 @@
 #include <iostream>
 #include <string>
 
-#include "array.hpp"
-#include "person.hpp"
+#include "../common/array.hpp"
+#include "../common/person.hpp"
 
 namespace matveev
 {
